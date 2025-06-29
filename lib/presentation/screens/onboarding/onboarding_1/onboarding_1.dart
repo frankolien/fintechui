@@ -4,7 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../../../core/auth/sign_in.dart';
-import '../../../widgets/positioned_blue_card.dart';
+import '../../../widgets/onboardingwidget/positioned_blue_card.dart';
 
 class Onboarding1 extends StatefulWidget {
   const Onboarding1({super.key});

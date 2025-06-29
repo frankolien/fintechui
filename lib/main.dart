@@ -1,4 +1,4 @@
-import 'package:fintechui/presentation/screens/splash_screen.dart';
+import 'package:fintechui/presentation/screens/onboarding/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

@@ -3,7 +3,8 @@ import 'package:fintechui/core/auth/sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../presentation/screens/home.dart';
+import '../../presentation/screens/homepage/home.dart';
+import '../../presentation/screens/homepage/home_page.dart';
 import '../services/auth_service.dart';
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -342,7 +343,7 @@ class _SignUpState extends State<SignUp> {
                       :
                       GestureDetector(
                         onTap: (){
-                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> Home()));
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomePage()));
                         },
 
                         child: Container(
