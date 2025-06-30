@@ -1,5 +1,6 @@
 import 'package:fintechui/presentation/screens/homepage/atm_locator.dart';
 import 'package:fintechui/presentation/screens/homepage/home.dart';
+import 'package:fintechui/presentation/screens/homepage/qr_code_scanner_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'insurance_screen.dart';
@@ -75,7 +76,7 @@ class _HomePageState extends State<HomePage> {
       case 1:
         return AtmLocatorScreen();
       case 2:
-        return WalletScreen();
+        return QRScannerScreen();
       case 3:
         return TrendScreen();
       case 4:

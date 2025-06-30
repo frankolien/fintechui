@@ -154,7 +154,7 @@ class _ProfilePageState extends State<ProfilePage> {
                          ),
                        ),
                        Text(
-                           '\$4950.00',
+                           '\$8681.41',
                          style: TextStyle(
                            fontWeight: FontWeight.w700,
                                fontSize: 17,
