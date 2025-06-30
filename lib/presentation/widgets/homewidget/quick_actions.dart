@@ -52,7 +52,7 @@ class QuickActionsSection extends StatelessWidget {
           ),
         ),
         Container(
-          height: 120, // height for horizontal list
+          height: 100, // height for horizontal list
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: 16),
@@ -60,7 +60,7 @@ class QuickActionsSection extends StatelessWidget {
             itemBuilder: (context, index) {
               final action = quickActions[index];
               return Container(
-                width: 124,
+                width: 110,
                 margin: EdgeInsets.only(right: 16),
                 child: GestureDetector(
                   onTap: action.onTap,

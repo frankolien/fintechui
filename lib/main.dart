@@ -1,6 +1,10 @@
 import 'package:fintechui/presentation/screens/onboarding/splash_screen.dart';
+import 'package:fintechui/presentation/screens/profile/user_profile.dart' hide ThemeProvider;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'core/services/theme_provider.dart';
 
 class SlantedCardsDemo extends StatelessWidget {
   @override
@@ -303,13 +307,47 @@ class SlantedCardPainter extends CustomPainter {
   }
 }*/
 
-void main() async{
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+              fontFamily: "SF Pro Text",
+              brightness: Brightness.light,
+              scaffoldBackgroundColor: Colors.grey[50],
+            ),
+            darkTheme: ThemeData(
+              primarySwatch: Colors.blue,
+              fontFamily: "SF Pro Text",
+              brightness: Brightness.dark,
+              scaffoldBackgroundColor: const Color(0xFF121212),
+              appBarTheme: const AppBarTheme(
+                backgroundColor: Color(0xFF1E1E1E),
+              ),
+            ),
+            themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+            home: SplashScreen(),
+          );
+        },
+      ),
+    );
+  }
+}
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
       url: "https://gnliemnkeeoxgayjfjiv.supabase.co",
       anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdubGllbW5rZWVveGdheWpmaml2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0ODk5ODUsImV4cCI6MjA2NjA2NTk4NX0.OHq4Pf3Momf-C1GTEBlHwe4ma0tOcEKyC7sXfTRlWJI"
   );
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: SplashScreen()));
+  runApp(MyApp());
 }
+

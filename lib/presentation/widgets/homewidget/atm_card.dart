@@ -26,7 +26,7 @@ class AtmCard extends StatelessWidget {
             Color(0xFF4B57FF),
           ],
         ),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(13),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),

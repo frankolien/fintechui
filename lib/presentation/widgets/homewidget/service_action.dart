@@ -65,7 +65,7 @@ class ServiceActions extends StatelessWidget {
           ),
         ),
         Container(
-          height: 100,
+          height: 80,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: 16),
@@ -73,7 +73,7 @@ class ServiceActions extends StatelessWidget {
               itemBuilder:(context,index) {
                 final service = serviceActions[index];
                 return Container(
-                  width: 76,
+                  width:80,
                   margin: EdgeInsets.only(right: 16),
                   child: GestureDetector(
                     onTap: service.onTap,
@@ -86,10 +86,8 @@ class ServiceActions extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Container(
-                            width: 50,
-                            height: 50,
                             decoration: BoxDecoration(
-                              color: Colors.grey[100],
+                              color: Colors.grey[50],
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Icon(

@@ -1,10 +1,15 @@
 import 'package:fintechui/presentation/screens/homepage/home_page.dart';
+import 'package:fintechui/presentation/screens/profile/user_profile.dart';
 import 'package:fintechui/presentation/widgets/homewidget/card_carousel.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets/homewidget/quick_actions.dart';
 import '../../widgets/homewidget/scheduled_payment.dart';
 import '../../widgets/homewidget/service_action.dart';
+import 'package:flutter/material.dart';
+import "package:flutter/services.dart";
+import "package:provider/provider.dart";
+import "package:shared_preferences/shared_preferences.dart";
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -16,6 +21,14 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
+    void navigateToProfile(BuildContext context) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProfilePage(themeProvider: ThemeProvider()),
+        ),
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       appBar:  AppBar(
@@ -24,8 +37,11 @@ class _HomeState extends State<Home> {
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: CircleAvatar(
-                child: Image.asset("lib/images/profile.png"),
+              child: GestureDetector(
+                onTap: ()=> navigateToProfile(context),
+                child: CircleAvatar(
+                  child: Image.asset("lib/images/profile.png"),
+                ),
               ),
             ),
             Positioned(
@@ -73,8 +89,9 @@ class _HomeState extends State<Home> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizedBox(height: 30,),
             SizedBox(
-              height: 228,
+              height: 215,
               child: CardCarousel(),
             ),
             SizedBox(height: 15,),
