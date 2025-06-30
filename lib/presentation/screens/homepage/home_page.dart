@@ -1,3 +1,4 @@
+import 'package:fintechui/presentation/screens/homepage/atm_locator.dart';
 import 'package:fintechui/presentation/screens/homepage/home.dart';
 import 'package:flutter/material.dart';
 
@@ -46,11 +47,11 @@ class _HomePageState extends State<HomePage> {
               label: '',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.shield_outlined),
+              icon: Icon(Icons.location_pin),
               label: '',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.account_balance_wallet_outlined),
+              icon: Icon(Icons.qr_code_scanner_sharp),
               label: '',
             ),
             BottomNavigationBarItem(
@@ -72,7 +73,7 @@ class _HomePageState extends State<HomePage> {
       case 0:
         return Home(); // Your main content
       case 1:
-        return InsuranceScreen();
+        return AtmLocatorScreen();
       case 2:
         return WalletScreen();
       case 3:
