@@ -1,10 +1,12 @@
 import 'package:fintechui/presentation/screens/onboarding/splash_screen.dart';
 import 'package:fintechui/presentation/screens/profile/user_profile.dart' hide ThemeProvider;
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 
 import 'core/services/theme_provider.dart';
+import 'firebase_options.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -42,6 +44,10 @@ class MyApp extends StatelessWidget {
 }
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 
