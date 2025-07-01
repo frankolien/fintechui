@@ -1,4 +1,4 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+/*import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AuthService {
@@ -10,8 +10,6 @@ class AuthService {
   static Future<void> initialize() async {
     await dotenv.load();
     await Supabase.initialize(
-      url: dotenv.env['https://gnliemnkeeoxgayjfjiv.supabase.co']!,
-      anonKey: dotenv.env['eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdubGllbW5rZWVveGdheWpmaml2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0ODk5ODUsImV4cCI6MjA2NjA2NTk4NX0.OHq4Pf3Momf-C1GTEBlHwe4ma0tOcEKyC7sXfTRlWJI']!,
     );
   }
 
@@ -86,4 +84,4 @@ class AuthService {
 
   // Stream to listen to auth state changes
   Stream<AuthState> get authStateChanges => _supabaseClient.auth.onAuthStateChange;
-}
+}*/

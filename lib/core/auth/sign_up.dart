@@ -1,7 +1,6 @@
 
 import 'package:fintechui/core/auth/sign_in.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../presentation/screens/homepage/home.dart';
 import '../../presentation/screens/homepage/home_page.dart';
@@ -20,7 +19,7 @@ class _SignUpState extends State<SignUp> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _numberController = TextEditingController();
   final TextEditingController _cncController = TextEditingController();
-  final _authService = AuthService();
+  //final _authService = AuthService();
 
 
   @override
@@ -89,29 +88,13 @@ class _SignUpState extends State<SignUp> {
 
     setState(() => _isLoading = true);
 
-    try {
-      await _authService.signUpWithEmail(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-        name: _nameController.text.trim(),
-        phone: _numberController.text.trim(),
-      );
+
 
       // Navigate to home screen after successful signup
       Navigator.pushReplacement(
           context, MaterialPageRoute(
           builder: (context)=> Home()));
-    } on AuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message)),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred')),
-      );
-    } finally {
-      setState(() => _isLoading = false);
-    }
+
   }
 
 
