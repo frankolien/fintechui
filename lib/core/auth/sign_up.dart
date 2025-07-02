@@ -1,10 +1,13 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fintechui/core/auth/sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../presentation/screens/homepage/home.dart';
 import '../../presentation/screens/homepage/home_page.dart';
 import '../services/auth_service.dart';
+import '../services/user_service.dart';
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
 
@@ -15,6 +18,7 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _numberController = TextEditingController();
@@ -31,7 +35,7 @@ class _SignUpState extends State<SignUp> {
     _numberController.dispose();
     _cncController.dispose();
   }
-
+  String? errorMessage;
   bool _isChecked = false;
   bool _isLoading = false;
   bool _obscurepassword = true;
@@ -83,7 +87,7 @@ class _SignUpState extends State<SignUp> {
 
 
 
-  Future<void> _signUp() async {
+  /*Future<void> _signUp() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
@@ -95,6 +99,84 @@ class _SignUpState extends State<SignUp> {
           context, MaterialPageRoute(
           builder: (context)=> Home()));
 
+  }*/
+
+// Refactored sign up function
+  Future<void> _signUp() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      String authResult = await AuthService().signupUser(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+
+      if (authResult != "success") {
+        _showErrorMessage(authResult);
+        return;
+      }
+
+      String userDataResult = await UserService().saveUserData(
+        email: _emailController.text.trim(),
+        username: _generateUsername(), // or use a separate username field
+        fullName: _fullNameController.text.trim(),
+        phoneNumber: _numberController.text.trim(),
+      );
+
+      if (userDataResult != "success") {
+        _showErrorMessage("Failed to save profile: $userDataResult");
+        return;
+      }
+
+      _showSuccessMessage('Account created successfully!');
+
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Home())
+      );
+
+    } catch (e) {
+      print('Sign up error: $e');
+      _showErrorMessage('An unexpected error occurred. Please try again.');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+// Helper method to generate username from email (you can customize this)
+  String _generateUsername() {
+    String email = _nameController.text.trim();
+    return email.split('@')[0]; // Use part before @ as username
+  }
+
+// Helper method to show error messages
+  void _showErrorMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 4),
+      ),
+    );
+  }
+
+// Helper method to show success messages
+  void _showSuccessMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 3),
+      ),
+    );
   }
 
 
@@ -103,7 +185,7 @@ class _SignUpState extends State<SignUp> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Color(0xFF1A1B2E),
-      body: SizedBox.expand(
+      body: SingleChildScrollView(
         child: Stack(
           children: [
             Positioned(
@@ -141,7 +223,7 @@ class _SignUpState extends State<SignUp> {
                           controller: _nameController,
                           textInputAction: TextInputAction.next,
                           decoration: InputDecoration(
-                            hintText: 'Name',
+                            hintText: 'Username',
                             hintStyle: TextStyle(
                                 color: Colors.grey
                             ),
@@ -149,6 +231,31 @@ class _SignUpState extends State<SignUp> {
                               borderSide: Divider.createBorderSide(context)
                             ),
                             contentPadding: EdgeInsetsGeometry.all(25)
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.025,),
+                      Container(
+                        width: 350,
+
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white,
+                        ),
+                        child: TextFormField(
+                          validator: _validateName,
+                          textAlign: TextAlign.start,
+                          controller: _fullNameController,
+                          textInputAction: TextInputAction.next,
+                          decoration: InputDecoration(
+                              hintText: 'Full Name',
+                              hintStyle: TextStyle(
+                                  color: Colors.grey
+                              ),
+                              border: OutlineInputBorder(
+                                  borderSide: Divider.createBorderSide(context)
+                              ),
+                              contentPadding: EdgeInsetsGeometry.all(25)
                           ),
                         ),
                       ),
@@ -242,7 +349,7 @@ class _SignUpState extends State<SignUp> {
                                ),
                                child: TextFormField(
                                  validator: _validatePassword,
-                                 obscureText: true,
+                                 obscureText: _obscurepassword,
                                  textAlign: TextAlign.start,
                                  textInputAction: TextInputAction.next,
                                  controller: _passwordController,
@@ -321,29 +428,41 @@ class _SignUpState extends State<SignUp> {
                         ),
                       ),
                       SizedBox(height: MediaQuery.of(context).size.height * 0.025,),
-                      _isLoading
-                          ? CircularProgressIndicator()
-                      :
-                      GestureDetector(
-                        onTap: (){
-                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomePage()));
-                        },
-
-                        child: Container(
-                          width: 350,
-                          height: 70,
-                          //color: Colors.blue,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Color(0xFf456EFE),
-                          ),
-                          child: Center(child: Text(
-                            'Login',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20
+                      SizedBox(
+                        width: 350,
+                        height: 70,
+                        child: ElevatedButton(
+                          onPressed: _isLoading ? null : _signUp,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:Color(0xFf456EFE),
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
+                          child: _isLoading
+                              ? Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              Text('Creating Account...'),
+                            ],
+                          )
+                              : Text(
+                            'Sign Up',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),

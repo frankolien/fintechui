@@ -1,87 +1,92 @@
-/*import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
-  final SupabaseClient _supabaseClient;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  AuthService() : _supabaseClient = Supabase.instance.client;
-
-  // Initialize Supabase
-  static Future<void> initialize() async {
-    await dotenv.load();
-    await Supabase.initialize(
-    );
-  }
-
-  // Sign up with email and password
-  Future<AuthResponse> signUpWithEmail({
-    required String email,
-    required String password,
-    required String name,
-    String? phone,
-  }) async {
-    final response = await _supabaseClient.auth.signUp(
-      email: email,
-      password: password,
-      data: {
-        'name': name,
-        'phone': phone,
-      },
-    );
-
-    return response;
-  }
-
-  // Sign in with email and password
-  Future<AuthResponse> signInWithEmail({
+  // Sign up user
+  Future<String> signupUser({
     required String email,
     required String password,
   }) async {
-    final response = await _supabaseClient.auth.signInWithPassword(
-      email: email,
-      password: password,
-    );
-
-    return response;
+    try {
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return "success";
+    } on FirebaseAuthException catch (e) {
+      return _handleAuthException(e);
+    } catch (e) {
+      return "An unexpected error occurred: ${e.toString()}";
+    }
   }
 
-  // Sign out
-  Future<void> signOut() async {
-    await _supabaseClient.auth.signOut();
+  // Login user
+  Future<String> loginUser({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return "success";
+    } on FirebaseAuthException catch (e) {
+      return _handleAuthException(e);
+    } catch (e) {
+      return "An unexpected error occurred: ${e.toString()}";
+    }
+  }
+
+  // Logout user
+  Future<void> logoutUser() async {
+    await _auth.signOut();
   }
 
   // Get current user
-  User? get currentUser => _supabaseClient.auth.currentUser;
-
-  // Get user profile
-  Future<Map<String, dynamic>> getProfile() async {
-    final userId = _supabaseClient.auth.currentUser?.id;
-    if (userId == null) throw Exception('User not logged in');
-
-    final response = await _supabaseClient
-        .from('profiles')
-        .select()
-        .eq('id', userId)
-        .single();
-
-    return response;
+  User? getCurrentUser() {
+    return _auth.currentUser;
   }
 
-  // Update profile
-  Future<void> updateProfile({
-    String? name,
-    String? phone,
-  }) async {
-    final userId = _supabaseClient.auth.currentUser?.id;
-    if (userId == null) throw Exception('User not logged in');
-
-    await _supabaseClient.from('profiles').update({
-      if (name != null) 'name': name,
-      if (phone != null) 'phone': phone,
-      'updated_at': DateTime.now().toIso8601String(),
-    }).eq('id', userId);
+  // Check if user is logged in
+  bool isUserLoggedIn() {
+    return _auth.currentUser != null;
   }
 
-  // Stream to listen to auth state changes
-  Stream<AuthState> get authStateChanges => _supabaseClient.auth.onAuthStateChange;
-}*/
+  // Firebase Auth exceptions
+  String _handleAuthException(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'weak-password':
+        return 'The password provided is too weak.';
+      case 'email-already-in-use':
+        return 'An account already exists for this email.';
+      case 'invalid-email':
+        return 'The email address is not valid.';
+      case 'user-not-found':
+        return 'No user found for this email.';
+      case 'wrong-password':
+        return 'Wrong password provided.';
+      case 'user-disabled':
+        return 'This account has been disabled.';
+      case 'too-many-requests':
+        return 'Too many failed attempts. Please try again later.';
+      case 'operation-not-allowed':
+        return 'Email/password accounts are not enabled.';
+      default:
+        return 'Authentication error: ${e.message ?? 'Unknown error'}';
+    }
+  }
+
+  // Reset password
+  Future<String> resetPassword({required String email}) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      return "success";
+    } on FirebaseAuthException catch (e) {
+      return _handleAuthException(e);
+    } catch (e) {
+      return "An unexpected error occurred: ${e.toString()}";
+    }
+  }
+}

@@ -25,7 +25,7 @@ class _HomeState extends State<Home> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ProfilePage(themeProvider: ThemeProvider()),
+          builder: (context) => ProfilePage(),
         ),
       );
     }

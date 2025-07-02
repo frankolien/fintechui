@@ -45,9 +45,14 @@ class MyApp extends StatelessWidget {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
+  try {
+    await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
-  );
+    );
+    print("Firebase initialized successfully");
+  } catch (e) {
+    print("Firebase initialization error: $e");
+  }
   runApp(MyApp());
 }
 

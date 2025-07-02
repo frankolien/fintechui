@@ -46,7 +46,7 @@ class AtmCard extends StatelessWidget {
                mainAxisAlignment: MainAxisAlignment.start,
                crossAxisAlignment: CrossAxisAlignment.start,
                children: [
-                 Text("Available balaance",style: TextStyle(color: Colors.white),),
+                 Text("Available balance",style: TextStyle(color: Colors.white),),
                  Text("\$ $availableBalance", style: TextStyle(
                    color: Colors.white,
                    fontSize: 25,
