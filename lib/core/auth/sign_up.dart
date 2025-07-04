@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fintechui/core/auth/sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -54,7 +53,7 @@ class _SignUpState extends State<SignUp> {
     if (value == null || value.isEmpty) {
       return "please enter a valid Email";
     }
-    final emailRegex = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,}$');
+    final emailRegex = RegExp(r'^[\w.-]+@([\w-]+\.)+[\w-]{2,}$');
     if (!emailRegex.hasMatch(value)){
     return "please enter a valid Email";
     }
@@ -138,7 +137,7 @@ class _SignUpState extends State<SignUp> {
 
       Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Home())
+          MaterialPageRoute(builder: (context) => HomePage())
       );
 
     } catch (e) {

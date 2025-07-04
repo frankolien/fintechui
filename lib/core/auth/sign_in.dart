@@ -103,7 +103,7 @@ class _SignInState extends State<SignIn> {
                             color: Colors.white,
                              child: TextField(
                               textAlign: TextAlign.start,
-
+                              keyboardType: TextInputType.emailAddress,
                               controller: _usernameController,
                               decoration: InputDecoration(
                                 hintText: 'User Id',

@@ -1,3 +1,4 @@
+import 'package:fintechui/presentation/screens/transferscreen/money_transfer.dart';
 import 'package:flutter/material.dart';
 class QuickAction {
   final String title;
@@ -14,12 +15,17 @@ class QuickAction {
 }
 
 class QuickActionsSection extends StatelessWidget {
-  final List<QuickAction> quickActions = [
+  
+  @override
+  Widget build(BuildContext context) {
+    final List<QuickAction> quickActions = [
     QuickAction(
       title: 'Money Transfer',
       icon: Icons.attach_money,
       backgroundColor: Colors.green.shade100,
-      onTap: () => print('Money Transfer tapped'),
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context)=> MoneyTransfer()));
+      },
     ),
     QuickAction(
       title: 'Pay Bill',
@@ -35,8 +41,6 @@ class QuickActionsSection extends StatelessWidget {
     ),
   ];
 
-  @override
-  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

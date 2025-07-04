@@ -1,6 +1,12 @@
-import 'dart:js_interop';
 
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fintechui/presentation/screens/onboarding/splash_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../core/services/user_service.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -11,6 +17,44 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  File? _imageFile;
+  final ImagePicker _picker = ImagePicker();
+  bool _isUploading = false;
+
+  Future<void> _pickImage() async {
+    final picked = await _picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      setState(() => _imageFile = File(picked.path));
+    }
+  }
+
+  Future<void> _uploadImage() async {
+    if (_imageFile == null) return;
+
+    setState(() => _isUploading = true);
+
+    try {
+      final userId = FirebaseAuth.instance.currentUser!.uid;
+      final ref = FirebaseStorage.instance.ref().child('profile_pictures').child('$userId.jpg');
+
+      await ref.putFile(_imageFile!);
+
+      final downloadUrl = await ref.getDownloadURL();
+
+      // Save the URL in Firestore
+      await FirebaseFirestore.instance.collection('users').doc(userId).update({
+        'profilePicture': downloadUrl,
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile picture updated!')));
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Upload failed')));
+    } finally {
+      setState(() => _isUploading = false);
+    }
+  }
+
   Map<String, dynamic>? userData;
   bool isLoading = true;
 
@@ -32,7 +76,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    if (isLoading) return const Center(child: CircularProgressIndicator());
+    if (isLoading) return CircularProgressIndicator();
     if (userData == null) return const Center(child: Text('Failed to load user data.'));
 
     return Scaffold(
@@ -67,12 +111,21 @@ class _ProfilePageState extends State<ProfilePage> {
               const SizedBox(height: 10),
               Stack(
                 children: [
-                  CircleAvatar(
-                    radius: 54,
-                    backgroundImage: NetworkImage(
-                      'https://media.licdn.com/dms/image/v2/D4D03AQHFzR3cYawcGg/profile-displayphoto-shrink_800_800/B4DZdOB9gLGYAg-/0/1749360829128?e=1756944000&v=beta&t=OWtyfqBkydBtiMlSTnRaar0WGVVoKpu8Kz7KS41VRWI',
-                    ),
+                  _imageFile != null
+                      ? CircleAvatar(radius: 60, backgroundImage: FileImage(_imageFile!))
+                      : CircleAvatar(radius: 60, backgroundColor: Colors.grey[300], child: Icon(Icons.person, size: 60)),
+
+                  SizedBox(height: 10),
+                  /*ElevatedButton.icon(
+                    onPressed: _pickImage,
+                    icon: Icon(Icons.camera_alt),
+                    label: Text('Choose Image'),
                   ),
+                  if (_imageFile != null)
+                    ElevatedButton(
+                      onPressed: _isUploading ? null : _uploadImage,
+                      child: _isUploading ? CircularProgressIndicator() : Text('Upload'),
+                    ),*/
                   Positioned(
                     bottom: 0,
                     left: 70,
@@ -80,12 +133,33 @@ class _ProfilePageState extends State<ProfilePage> {
                       width: 35,
                       height: 35,
                       decoration: const BoxDecoration(
-                        color: Colors.blue,
+                        color: Colors.grey,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.edit, color: Colors.white, size: 20),
+                      child: GestureDetector(
+                        onTap: _pickImage,
+                          child: const Icon(
+                              Icons.camera_alt,
+                              color: Colors.white,
+                              size: 20
+                          ),
+
+                      ),
                     ),
                   ),
+                  if (_imageFile != null)
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:Colors.blue
+                      ),
+                      onPressed: _isUploading ? null : _uploadImage,
+                      child: _isUploading ? CircularProgressIndicator() : Text(
+                          'Upload',
+                        style: TextStyle(
+                          color: Colors.white
+                        ),
+                      ),
+                    ),
                 ],
               ),
               const SizedBox(height: 10),

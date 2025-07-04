@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage> {
       case 3:
         return TrendScreen();
       case 4:
-        return MenuScreen();
+        return TestPicker();
       default:
         return Home();
     }
