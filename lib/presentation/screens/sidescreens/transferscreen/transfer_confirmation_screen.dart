@@ -1,3 +1,4 @@
+import 'package:fintechui/presentation/screens/sidescreens/transferscreen/transfer_confirmation_screen_2.dart';
 import 'package:flutter/material.dart';
 
 class TransferConfirmationScreen extends StatelessWidget {
@@ -355,7 +356,13 @@ class TransferConfirmationScreen extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () {
           // Handle continue action
-          _showSuccessDialog(context);
+          //_showSuccessDialog(context);
+          Navigator.push(context, MaterialPageRoute(builder: (context) => TransferConfirmationScreen2(
+            recipientName: recipientName,
+            recipientAccount: recipientAccount,
+            transferAmount: transferAmount,
+            transferFee: transferFee,
+          )));
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Color(0xFF5B7CFF),

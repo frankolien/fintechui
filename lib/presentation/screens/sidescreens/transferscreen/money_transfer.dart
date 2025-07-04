@@ -1,4 +1,4 @@
-import 'package:fintechui/presentation/screens/transferscreen/transfer_confirmation_screen.dart';
+import 'package:fintechui/presentation/screens/sidescreens/transferscreen/transfer_confirmation_screen.dart';
 import 'package:fintechui/presentation/widgets/recent_transfer_card.dart';
 import 'package:flutter/material.dart';
 

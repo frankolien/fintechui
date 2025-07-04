@@ -1,4 +1,4 @@
-import 'package:fintechui/presentation/screens/transferscreen/money_transfer.dart';
+import 'package:fintechui/presentation/screens/sidescreens/transferscreen/money_transfer.dart';
 import 'package:flutter/material.dart';
 class QuickAction {
   final String title;
