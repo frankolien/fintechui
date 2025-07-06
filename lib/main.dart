@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
               primarySwatch: Colors.blue,
+              
               fontFamily: "SF Pro Text",
               brightness: Brightness.light,
               scaffoldBackgroundColor: Colors.grey[50],

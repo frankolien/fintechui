@@ -1,5 +1,8 @@
+import 'package:fintechui/presentation/screens/sidescreens/transferscreen/recent_transaction.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class TrendScreen extends StatefulWidget {
   @override
@@ -7,31 +10,33 @@ class TrendScreen extends StatefulWidget {
 }
 
 class _TrendScreenState extends State<TrendScreen> {
-  int selectedIndex = 4; // Nov 15 selected by default
+  int selectedIndex = 4;
+
+  double availableBalance = 0.0; // Will be loaded from Firestore
 
   // Chart data points
   final List<FlSpot> chartData = [
-    FlSpot(0, 3.8), 
+    FlSpot(0, 3.8),
     FlSpot(1, 3.9),
     FlSpot(2, 3.85),
-    FlSpot(3, 3.75), 
-    FlSpot(4, 3.65), 
-    FlSpot(5, 3.12), // Nov 15 (selected point)
-    FlSpot(6, 3.2), 
+    FlSpot(3, 3.75),
+    FlSpot(4, 3.65),
+    FlSpot(5, 3.12),
+    FlSpot(6, 3.2),
     FlSpot(7, 3.45),
     FlSpot(8, 3.8),
     FlSpot(9, 4.1),
-    FlSpot(10, 4.35), 
-    FlSpot(11, 4.5), 
-    FlSpot(12, 4.2), 
-    FlSpot(13, 4.0), 
-    FlSpot(14, 3.95), 
-    FlSpot(15, 3.85), 
+    FlSpot(10, 4.35),
+    FlSpot(11, 4.5),
+    FlSpot(12, 4.2),
+    FlSpot(13, 4.0),
+    FlSpot(14, 3.95),
+    FlSpot(15, 3.85),
     FlSpot(16, 3.9),
     FlSpot(17, 4.0),
-    FlSpot(18, 4.1), // Nov 28
-    FlSpot(19, 4.05), 
-    FlSpot(20, 4.0), 
+    FlSpot(18, 4.1),
+    FlSpot(19, 4.05),
+    FlSpot(20, 4.0),
   ];
 
   final List<String> dateLabels = [
@@ -40,6 +45,30 @@ class _TrendScreenState extends State<TrendScreen> {
     'Jun 20', 'Jun 21', 'Jun 22', 'Jun 23', 'Jun 24',
     'Jun 25', 'Jun 26', 'Jun 27', 'Jun 28', 'Jun 29', 'Jun 30'
   ];
+
+  // Mock values for Money In/Out
+  double moneyIn = 271.00;
+  double moneyOut = 180.00;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserBalance();
+  }
+
+  Future<void> _loadUserBalance() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+    if (doc.exists && doc.data()?['balance'] != null) {
+      setState(() {
+        availableBalance = (doc.data()!['balance'] as num).toDouble();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +91,8 @@ class _TrendScreenState extends State<TrendScreen> {
                         backgroundColor: Colors.grey[300],
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(20),
-                            child: Image.network("https://media.licdn.com/dms/image/v2/D4D03AQHFzR3cYawcGg/profile-displayphoto-shrink_800_800/B4DZdOB9gLGYAg-/0/1749360829128?e=1756944000&v=beta&t=OWtyfqBkydBtiMlSTnRaar0WGVVoKpu8Kz7KS41VRWI")),
+                          child: Icon(Icons.person, color: Colors.grey[600], size: 30),
+                        ),
                       ),
                     ],
                   ),
@@ -79,8 +109,7 @@ class _TrendScreenState extends State<TrendScreen> {
                       CircleAvatar(
                         radius: 25,
                         backgroundColor: Colors.grey[200],
-                        child: Icon(Icons.notifications_outlined,
-                            color: Colors.grey[600]),
+                        child: Icon(Icons.notifications_outlined, color: Colors.grey[600]),
                       ),
                       Positioned(
                         top: 8,
@@ -117,7 +146,7 @@ class _TrendScreenState extends State<TrendScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          '\$4,228',
+                          '\$${availableBalance.floor()}',
                           style: TextStyle(
                             fontSize: 48,
                             fontWeight: FontWeight.bold,
@@ -125,7 +154,7 @@ class _TrendScreenState extends State<TrendScreen> {
                           ),
                         ),
                         Text(
-                          '.76',
+                          '.${(availableBalance * 100).toInt() % 100}'.padLeft(2, '0'),
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -133,7 +162,10 @@ class _TrendScreenState extends State<TrendScreen> {
                           ),
                         ),
                         SizedBox(width: 8),
-                        Image.network("https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Flag_of_Nigeria.svg/960px-Flag_of_Nigeria.svg.png",height: 10,),
+                        Image.network(
+                          "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Flag_of_Nigeria.svg/960px-Flag_of_Nigeria.svg.png",
+                          height: 10,
+                        ),
                       ],
                     ),
                   ],
@@ -186,7 +218,7 @@ class _TrendScreenState extends State<TrendScreen> {
                         dotData: FlDotData(
                           show: true,
                           getDotPainter: (spot, percent, barData, index) {
-                            if (index == 5) { // Nov 15 - selected point
+                            if (index == 5) {
                               return FlDotCirclePainter(
                                 radius: 8,
                                 color: Colors.blue,
@@ -295,7 +327,7 @@ class _TrendScreenState extends State<TrendScreen> {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            '\$271.00',
+                            '\$${moneyIn.toStringAsFixed(2)}',
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -340,7 +372,7 @@ class _TrendScreenState extends State<TrendScreen> {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            '\$180.00',
+                            '\$${moneyOut.toStringAsFixed(2)}',
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -376,7 +408,7 @@ class _TrendScreenState extends State<TrendScreen> {
               SizedBox(height: 20),
 
               // Transaction items
-              Column(
+              /*Column(
                 children: [
                   _buildTransactionItem(
                     'Dropbox',
@@ -402,7 +434,8 @@ class _TrendScreenState extends State<TrendScreen> {
                     'Jul 04, 2021',
                   ),
                 ],
-              ),
+              ),*/
+              TransactionHistoryScreen(),
             ],
           ),
         ),
@@ -634,7 +667,7 @@ class _TrendScreenState extends State<TrendScreen> {
                   ],
                 ),
               ),
-              SizedBox(height: 20), // Add bottom padding
+              SizedBox(height: 20),
             ],
           ),
         ),

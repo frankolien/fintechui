@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "800143775740",
+    "project_id": "olien-875f1",
+    "storage_bucket": "olien-875f1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:800143775740:android:4b724aaa614c1b438e4479",
+        "android_client_info": {
+          "package_name": "com.example.fintechui"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAua-tpEICA6N30toXTTaJUJJzMmIeMqC0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

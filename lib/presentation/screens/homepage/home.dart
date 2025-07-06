@@ -40,9 +40,10 @@ class _HomeState extends State<Home> {
               child: GestureDetector(
                 onTap: ()=> navigateToProfile(context),
                 child: CircleAvatar(
+                  backgroundColor: Colors.grey[200],
                   child: ClipRRect(
                     borderRadius: BorderRadius.all(Radius.circular(20)),
-                      child: Image.network("https://media.licdn.com/dms/image/v2/D4D03AQHFzR3cYawcGg/profile-displayphoto-shrink_800_800/B4DZdOB9gLGYAg-/0/1749360829128?e=1756944000&v=beta&t=OWtyfqBkydBtiMlSTnRaar0WGVVoKpu8Kz7KS41VRWI")),
+                      child: Icon(Icons.person,color: Colors.grey[600],size: 30,)),
                 ),
               ),
             ),

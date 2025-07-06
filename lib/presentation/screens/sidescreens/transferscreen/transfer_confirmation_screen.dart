@@ -5,6 +5,8 @@ class TransferConfirmationScreen extends StatelessWidget {
   final String recipientName;
   final String recipientAccount;
   final String transferAmount;
+  final String recipientUid;
+  final String purpose;
   final String transferFee;
   final String cardType;
   final String cardNumber;
@@ -14,6 +16,8 @@ class TransferConfirmationScreen extends StatelessWidget {
     required this.recipientName,
     required this.recipientAccount,
     required this.transferAmount,
+    required this.recipientUid,
+    required this.purpose,
     this.transferFee = "0.00",
     this.cardType = "Debit Card",
     this.cardNumber = "Master Card",
@@ -137,16 +141,19 @@ class TransferConfirmationScreen extends StatelessWidget {
             height: 50,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(25),
-             /*image: DecorationImage(
-                image: AssetImage('lib/images/image_2.png'), // You can customize this
-                fit: BoxFit.cover,
-              ),*/
             ),
             child: CircleAvatar(
               radius: 25,
-              child: Icon(Icons.person_outline, size: 30, color: Colors.grey[600]),
-              backgroundColor: Colors.grey[200], // Placeholder color
-            )
+              child: Text(
+                recipientName.isNotEmpty ? recipientName[0].toUpperCase() : 'U',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              backgroundColor: Color(0xFF5B7CFF),
+            ),
           ),
           SizedBox(width: 16),
           // Recipient Info
@@ -355,14 +362,20 @@ class TransferConfirmationScreen extends StatelessWidget {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
-          // Handle continue action
-          //_showSuccessDialog(context);
-          Navigator.push(context, MaterialPageRoute(builder: (context) => TransferConfirmationScreen2(
-            recipientName: recipientName,
-            recipientAccount: recipientAccount,
-            transferAmount: transferAmount,
-            transferFee: transferFee,
-          )));
+          Navigator.push(
+            context, 
+            MaterialPageRoute(
+              builder: (context) => TransferConfirmationScreen2(
+                recipientName: recipientName,
+                recipientAccount: recipientAccount,
+                transferAmount: transferAmount,
+                recipientUid: recipientUid,
+                purpose: purpose,
+                transferFee: transferFee,
+                cardType: cardType,
+              )
+            )
+          );
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Color(0xFF5B7CFF),
@@ -382,69 +395,4 @@ class TransferConfirmationScreen extends StatelessWidget {
       ),
     );
   }
-
-  void _showSuccessDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Column(
-            children: [
-              Icon(
-                Icons.check_circle,
-                color: Colors.green,
-                size: 48,
-              ),
-              SizedBox(height: 16),
-              Text(
-                'Transfer Successful!',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          content: Text(
-            'Your transfer of \$${transferAmount} to ${recipientName} has been completed successfully.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.grey[600],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                'Done',
-                style: TextStyle(
-                  color: Color(0xFF5B7CFF),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
 }
-
-// Usage example:
-// Navigator.push(
-//   context,
-//   MaterialPageRoute(
-//     builder: (context) => TransferConfirmationScreen(
-//       recipientName: 'Jonathan',
-//       recipientAccount: '1*******6103',
-//       transferAmount: '250.00',
-//       transferFee: '0.00',
-//     ),
-//   ),
-// );

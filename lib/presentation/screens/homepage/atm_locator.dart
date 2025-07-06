@@ -87,21 +87,12 @@ class _AtmLocatorScreenState extends State<AtmLocatorScreen> {
               border: Border.all(color: Colors.grey.shade300),
             ),
             child: ClipOval(
-              child: Image.network(
-                'https://media.licdn.com/dms/image/v2/D4D03AQHFzR3cYawcGg/profile-displayphoto-shrink_800_800/B4DZdOB9gLGYAg-/0/1749360829128?e=1756944000&v=beta&t=OWtyfqBkydBtiMlSTnRaar0WGVVoKpu8Kz7KS41VRWI',
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: Colors.grey.shade200,
-                    child: Icon(
-                      Icons.person,
-                      color: Colors.grey.shade600,
-                      size: avatarSize * 0.6,
-                    ),
-                  );
-                },
-              ),
-            ),
+        
+              child: ClipRRect(
+    
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                      child: Icon(Icons.person,color: Colors.grey[600],size: 30,)),
+                ),
           ),
           SizedBox(width: isTablet ? 16 : 12),
 
