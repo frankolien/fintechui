@@ -96,7 +96,7 @@ class _SignInState extends State<SignIn> {
                       ),),
                       SizedBox(height: 28,),
                        SizedBox(
-                        width: 350,
+                        width: MediaQuery.of(context).size.width * 0.8,
                          child: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                            child: Container(
@@ -126,7 +126,7 @@ class _SignInState extends State<SignIn> {
                        SizedBox(height: 28,),
                        SizedBox(
 
-                        width: 350,
+                         width: MediaQuery.of(context).size.width * 0.8,
                          child: Container(
 
                            decoration: BoxDecoration(
@@ -169,7 +169,7 @@ class _SignInState extends State<SignIn> {
                     GestureDetector(
                       onTap: isLoading ? null : loginUser,
                       child: Container(
-                        width: 350,
+                         width: MediaQuery.of(context).size.width * 0.8,
                         height: 70,
                         //color: Colors.blue,
                         decoration: BoxDecoration(

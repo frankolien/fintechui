@@ -48,8 +48,8 @@ class _HomeState extends State<Home> {
               ),
             ),
             Positioned(
-              right: 8, // Adjust position as needed
-              top: 8, // Adjust position as needed
+              right: 8,
+              top: 8, 
               child: Container(
                 padding: EdgeInsets.all(2),
                 decoration: BoxDecoration(
@@ -57,13 +57,13 @@ class _HomeState extends State<Home> {
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: Colors
-                        .white, // Optional: for a white border around the dot
-                    width: 1, // Optional: border width
+                        .white, 
+                    width: 1, 
                   ),
                 ),
                 constraints: BoxConstraints(
-                  minWidth: 12, // Size of the dot
-                  minHeight: 12, // Size of the dot
+                  minWidth: 12, 
+                  minHeight: 12, 
                 ),
               ),
             ),

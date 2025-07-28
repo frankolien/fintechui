@@ -27,7 +27,7 @@ class _Onboarding2State extends State<Onboarding2> {
   /*transform: Matrix4.identity()
     ..setEntry(3, 2, 0.002)    // Add perspective
     ..rotateX(-0.1)            // Tilt back slightly  
-    ..rotateY(0.3)             // Turn to show depth
+    ..rotateY(0.3)             // Turn to show depth++
     ..translate(20.0, -30.0, 50.0),*/ // Move right, up, forward
     transform: Matrix4.rotationX(25),
 
@@ -43,7 +43,7 @@ class _Onboarding2State extends State<Onboarding2> {
             ),
            ),
            Positioned.fill(
-            top: 100,
+            top: MediaQuery.of(context).size.height * 0.1,
             child: Transform.rotate(
               angle: 0.01,
               child: Column(

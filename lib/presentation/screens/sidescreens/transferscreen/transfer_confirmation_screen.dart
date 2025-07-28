@@ -1,3 +1,5 @@
+import 'package:fintechui/core/models/bank_model.dart';
+import 'package:fintechui/presentation/screens/sidescreens/paybillscreen/account_detail_screen.dart';
 import 'package:fintechui/presentation/screens/sidescreens/transferscreen/transfer_confirmation_screen_2.dart';
 import 'package:flutter/material.dart';
 
@@ -10,18 +12,29 @@ class TransferConfirmationScreen extends StatelessWidget {
   final String transferFee;
   final String cardType;
   final String cardNumber;
+   final BankModel bank;
+  final String accountNumber;
+  final String accountName;
+  final String amount;
+
+  
+  
 
   const TransferConfirmationScreen({
-    Key? key,
-    required this.recipientName,
-    required this.recipientAccount,
-    required this.transferAmount,
-    required this.recipientUid,
-    required this.purpose,
-    this.transferFee = "0.00",
-    this.cardType = "Debit Card",
-    this.cardNumber = "Master Card",
-  }) : super(key: key);
+  Key? key,
+  required this.recipientName,
+  required this.recipientAccount,
+  required this.transferAmount,
+  required this.recipientUid,
+  required this.purpose,
+  this.transferFee = "0.00",
+  this.cardType = "Debit Card",
+  this.cardNumber = "Master Card",
+  required this.bank,
+  required this.accountNumber,
+  required this.accountName,
+  required this.amount,
+}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -361,22 +374,23 @@ class TransferConfirmationScreen extends StatelessWidget {
     return Container(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () {
-          Navigator.push(
-            context, 
-            MaterialPageRoute(
-              builder: (context) => TransferConfirmationScreen2(
-                recipientName: recipientName,
-                recipientAccount: recipientAccount,
-                transferAmount: transferAmount,
-                recipientUid: recipientUid,
-                purpose: purpose,
-                transferFee: transferFee,
-                cardType: cardType,
-              )
-            )
-          );
-        },
+   onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TransferConfirmationScreen2(
+              recipientName: recipientName,
+              recipientAccount: recipientAccount,
+              transferAmount: transferAmount,
+              recipientUid: recipientUid,
+              purpose: purpose,
+              transferFee: transferFee,
+              cardType: cardType,
+           
+            ),
+          ),
+        );
+      },
         style: ElevatedButton.styleFrom(
           backgroundColor: Color(0xFF5B7CFF),
           padding: EdgeInsets.symmetric(vertical: 16),

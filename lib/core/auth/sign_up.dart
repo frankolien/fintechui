@@ -210,7 +210,7 @@ class _SignUpState extends State<SignUp> {
                         ),),
                       SizedBox(height: MediaQuery.of(context).size.height * 0.025,),
                       Container(
-                        width: 350,
+                         width: MediaQuery.of(context).size.width * 0.8,
 
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
@@ -235,7 +235,7 @@ class _SignUpState extends State<SignUp> {
                       ),
                       SizedBox(height: MediaQuery.of(context).size.height * 0.025,),
                       Container(
-                        width: 350,
+                        width: MediaQuery.of(context).size.width * 0.8,
 
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
@@ -260,7 +260,7 @@ class _SignUpState extends State<SignUp> {
                       ),
                       SizedBox(height: MediaQuery.of(context).size.height * 0.025,),
                       Container(
-                        width: 350,
+                        width: MediaQuery.of(context).size.width * 0.8,
 
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
@@ -285,7 +285,7 @@ class _SignUpState extends State<SignUp> {
                       ),
                       SizedBox(height: MediaQuery.of(context).size.height * 0.025,),
                       Container(
-                        width: 350,
+                       width: MediaQuery.of(context).size.width * 0.8,
 
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
@@ -334,60 +334,78 @@ class _SignUpState extends State<SignUp> {
                         ),
                       ),
                      SizedBox(height: MediaQuery.of(context).size.height * 0.025,),*/
-                     Padding(
-                       padding: const EdgeInsets.symmetric(horizontal: 22.0,),
-                       child: Row(
-                         children: [
-                           Expanded(
-                             child: Container(
-                               //width: 10,
+                   // Replace the password field section (around line 367-410) with this:
 
-                               decoration: BoxDecoration(
-                                 borderRadius: BorderRadius.circular(10),
-                                 color: Colors.white,
-                               ),
-                               child: TextFormField(
-                                 validator: _validatePassword,
-                                 obscureText: _obscurepassword,
-                                 textAlign: TextAlign.start,
-                                 textInputAction: TextInputAction.next,
-                                 controller: _passwordController,
-                                 decoration: InputDecoration(
-                                     hintText: 'Password',
-                                     suffixIcon: IconButton(onPressed: (){
-                                       setState(() {
-                                         _obscurepassword = !_obscurepassword;
-                                       });
-                                     }, icon: Icon(
-                                       _obscurepassword ? Icons.visibility : Icons.visibility_off,
-                                     )),
-                                     hintStyle: TextStyle(
-                                         color: Colors.grey
-                                     ),
-                                     border: OutlineInputBorder(
-                                         borderSide: Divider.createBorderSide(context)
-                                     ),
-                                     contentPadding: EdgeInsetsGeometry.all(25)
-                                 ),
-                               ),
-                             ),
-                           ),
-                           SizedBox(width: 30,),
-                           Container(
-                             width: 60,
-
-                             decoration: BoxDecoration(
-                               borderRadius: BorderRadius.circular(10),
-                               color: Colors.white,
-                             ),
-                             child:  Image.asset('lib/images/fprint.png'),
-                           ),
-                         ],
-                       ),
-                     ),
+Container(
+  width: MediaQuery.of(context).size.width * 0.8,
+  decoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(10),
+    color: Colors.white,
+  ),
+  child: Row(
+    children: [
+      Expanded(
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.7,
+          child: TextFormField(
+            validator: _validatePassword,
+            obscureText: _obscurepassword,
+            textAlign: TextAlign.start,
+            textInputAction: TextInputAction.next,
+            controller: _passwordController,
+            decoration: InputDecoration(
+              hintText: 'Password',
+              suffixIcon: IconButton(
+                onPressed: (){
+                  setState(() {
+                    _obscurepassword = !_obscurepassword;
+                  });
+                }, 
+                icon: Icon(
+                  _obscurepassword ? Icons.visibility : Icons.visibility_off,
+                )
+              ),
+              hintStyle: TextStyle(color: Colors.grey),
+              border: OutlineInputBorder(
+                borderSide: Divider.createBorderSide(context),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  bottomLeft: Radius.circular(10),
+                ),
+              ),
+              contentPadding: EdgeInsets.all(25),
+            ),
+          ),
+        ),
+      ),
+      Container(
+        width: 60,
+        height: 70, // Match the height of the text field
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(10),
+            bottomRight: Radius.circular(10),
+          ),
+          color: Colors.white,
+          border: Border(
+            left: BorderSide(color: Colors.grey.shade300, width: 1),
+          ),
+        ),
+        child: Center(
+          child: Image.asset(
+            'lib/images/fprint.png',
+            width: 30,
+            height: 30,
+          ),
+        ),
+      ),
+    ],
+  ),
+),
                       SizedBox(height: 13,),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      Container(
+
+                        width: MediaQuery.of(context).size.width * 0.81,
                         child: Row(
                           children: [
                             Checkbox(
@@ -401,7 +419,7 @@ class _SignUpState extends State<SignUp> {
                               checkColor: Colors.white,
                               // You can customize the color, size, and other properties.
                             ),
-
+                        
                             RichText(
                               text: TextSpan(
                                 children:[
@@ -421,14 +439,14 @@ class _SignUpState extends State<SignUp> {
                                   ),
                                       ]
                               ),
-
+                        
                             ),
                           ],
                         ),
                       ),
                       SizedBox(height: MediaQuery.of(context).size.height * 0.025,),
                       SizedBox(
-                        width: 350,
+                        width: MediaQuery.of(context).size.width * 0.8,
                         height: 70,
                         child: ElevatedButton(
                           onPressed: _isLoading ? null : _signUp,

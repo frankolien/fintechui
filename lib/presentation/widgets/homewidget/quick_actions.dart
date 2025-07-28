@@ -1,3 +1,5 @@
+import 'package:fintechui/presentation/screens/sidescreens/paybillscreen/bank_to_bank.dart';
+import 'package:fintechui/presentation/screens/sidescreens/paybillscreen/pay_bill_screen.dart';
 import 'package:fintechui/presentation/screens/sidescreens/transferscreen/money_transfer.dart';
 import 'package:flutter/material.dart';
 class QuickAction {
@@ -31,13 +33,18 @@ class QuickActionsSection extends StatelessWidget {
       title: 'Pay Bill',
       icon: Icons.receipt_long,
       backgroundColor: Colors.blue.shade100,
-      onTap: () => print('Pay Bill tapped'),
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context)=> PayBillScreen())),
     ),
     QuickAction(
       title: 'Bank to Bank',
       icon: Icons.account_balance,
       backgroundColor: Colors.grey.shade200,
-      onTap: () => print('Bank to Bank tapped'),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BankTransferScreen(), // Replace with actual Bank to Bank screen
+        ),
+    ),
     ),
   ];
 

@@ -20,7 +20,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _getBodyWidget(), // Your main content
+      body: _getBodyWidget(), 
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,

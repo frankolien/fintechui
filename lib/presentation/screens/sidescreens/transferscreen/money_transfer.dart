@@ -4,16 +4,23 @@ import 'package:flutter/services.dart';
 import 'package:fintechui/core/services/transfer_service.dart';
 import 'transfer_confirmation_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fintechui/core/models/bank_model.dart';
 
 class RecentTransfer {
   final Widget image;
   final String name;
   final String amount;
+  final BankModel? bank;
+  final String? accountNumber;
+  final String? accountName;
 
   RecentTransfer({
     required this.image,
     required this.name,
     required this.amount,
+       this.bank,
+  required this.accountNumber,
+  required this.accountName,
   });
 }
 
@@ -25,7 +32,7 @@ class MoneyTransfer extends StatefulWidget {
 }
 
 class _MoneyTransferState extends State<MoneyTransfer> {
-  //to verify password 
+  //verify password 
   Future<bool> _verifyPassword (String password) async {
     final user = FirebaseAuth.instance.currentUser;
     if(user ==null) return false;
@@ -60,27 +67,27 @@ class _MoneyTransferState extends State<MoneyTransfer> {
   final List<String> _quickAmounts = ["\$100", "\$150", "\$200"]; 
   int _selectedQuickAmount = -1;
 
-  // Recent transfers (first 4 are mock, new ones will be added at the top)
+   // mock datas
   List<RecentTransfer> _recentTransfer = [
     RecentTransfer(
       image: Image.asset("lib/images/image_1.png"), 
       name: "Dr.kamal", 
-      amount: "\$40.00"
+      amount: "\$40.00", bank: null, accountNumber: '', accountName: ''
     ),
     RecentTransfer(
       image: Image.asset("lib/images/image_2.png"), 
       name: "Jonathan", 
-      amount: "\$26.45"
+      amount: "\$26.45", bank: null, accountNumber: '', accountName: ''
     ),
     RecentTransfer(
       image: Image.asset("lib/images/image_3.png"), 
       name: "Will hoper", 
-      amount: "\$560.00"
+      amount: "\$560.00", bank: null, accountNumber: '', accountName: ''
     ),
     RecentTransfer(
       image: Image.asset("lib/images/apple.png"), 
       name: "David", 
-      amount: "\$12.75"
+      amount: "\$12.75", bank: null, accountNumber: '', accountName: ''
     )
   ];
 
@@ -143,7 +150,7 @@ class _MoneyTransferState extends State<MoneyTransfer> {
     });
   }
 
-  // Add recipient to recent transfers
+  // recipient to recent transfers
   void _addToRecentTransfers(Map<String, dynamic> recipient, String amount) {
     setState(() {
       _recentTransfer.insert(
@@ -154,7 +161,7 @@ class _MoneyTransferState extends State<MoneyTransfer> {
             backgroundColor: Colors.blue.shade100,
           ),
           name: recipient['username'],
-          amount: "\$$amount",
+          amount: "\$$amount", bank: null, accountNumber: '', accountName: '',
         ),
       );
       // Optional: Limit to last 10
@@ -372,7 +379,7 @@ class _MoneyTransferState extends State<MoneyTransfer> {
                     _buildTextField(_purposeController, "Purpose of payment (Optional)", TextInputType.text),
                     SizedBox(height: 16),
                     
-                    // Password field
+                   
                     Container(
                       height: 60,
                       decoration: BoxDecoration(
@@ -704,19 +711,28 @@ class _AmountModalContentState extends State<_AmountModalContent> {
                     });
                     return;
                   }
-                  // Add to recent transfers before navigating
+                 
                   widget.addToRecentTransfers(widget.selectedRecipient!, widget.amountController.text);
 
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => TransferConfirmationScreen(
-                      recipientName: widget.selectedRecipient!['username'],
-                      recipientAccount: widget.selectedRecipient!['email'],
-                      transferAmount: widget.amountController.text,
-                      recipientUid: widget.selectedRecipient!['uid'],
-                      purpose: widget.purposeController.text,
-                    ),
-                  ));
-                },
+   Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => TransferConfirmationScreen(
+      recipientName: widget.selectedRecipient!['username'],
+      recipientAccount: widget.selectedRecipient!['email'],
+      transferAmount: widget.amountController.text,
+      recipientUid: widget.selectedRecipient!['uid'],
+      purpose: widget.purposeController.text,
+      bank: BankModel(name: "Framl", code: "Nigga", slug: "Nigga", logo: "Niggga", color: Colors.white), 
+      accountNumber: '',
+      accountName: '',
+      amount: widget.amountController.text, 
+    ),
+  ),
+);
+
+
+      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF5B7CFF),
                   padding: EdgeInsets.symmetric(vertical: 16),
