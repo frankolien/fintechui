@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/services/user_service.dart';
+import '../../../core/services/auth_service.dart';
 
 
 class ProfileDashboard extends StatefulWidget {
@@ -114,9 +115,7 @@ class _ProfileDashboardState extends State<ProfileDashboard> {
 
             // Logout Button
             GestureDetector(
-              onTap: () {
-                // Add logout functionality
-              },
+              onTap: () => _handleLogout(context),
               child: Container(
                 width: double.infinity,
                 height: 50,
@@ -140,6 +139,76 @@ class _ProfileDashboardState extends State<ProfileDashboard> {
         ),
       ),
     );
+  }
+
+  Future<void> _handleLogout(BuildContext context) async {
+    // Show confirmation dialog
+    bool? shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Log Out'),
+          content: Text('Are you sure you want to log out?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text('Log Out'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldLogout == true) {
+      try {
+        // Show loading indicator
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          },
+        );
+
+        // Perform logout
+        final authService = AuthService();
+        await authService.logoutUser();
+
+        // Close loading dialog
+        Navigator.of(context).pop();
+
+        // Navigate to onboarding screen
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          '/onboarding',
+          (Route<dynamic> route) => false,
+        );
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Successfully logged out'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } catch (e) {
+        // Close loading dialog
+        Navigator.of(context).pop();
+
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error logging out: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildDetailCard(String label, String value) {

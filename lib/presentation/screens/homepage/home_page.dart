@@ -4,23 +4,21 @@ import 'package:fintechui/presentation/screens/homepage/qr_code_scanner_screen.d
 import 'package:fintechui/presentation/screens/sidescreens/transferscreen/recent_transaction.dart';
 import 'package:fintechui/presentation/screens/sidescreens/transferscreen/transfer_successful_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../viewmodels/home_page_view_model.dart';
 import 'insurance_screen.dart';
 import 'menu_screen.dart';
 import 'trend_screen.dart';
 import 'wallet_screen.dart';
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerWidget {
   @override
-  _HomePageState createState() => _HomePageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedIndex = ref.watch(homePageViewModelProvider);
+    final homePageViewModel = ref.read(homePageViewModelProvider.notifier);
 
-class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
-      body: _getBodyWidget(), 
+      body: _getBodyWidget(selectedIndex), 
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -38,11 +36,9 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: Colors.white,
           selectedItemColor: Colors.blue,
           unselectedItemColor: Colors.grey,
-          currentIndex: _selectedIndex,
+          currentIndex: selectedIndex,
           onTap: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
+            homePageViewModel.changeTab(index);
           },
           items: [
             BottomNavigationBarItem(
@@ -71,8 +67,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _getBodyWidget() {
-    switch (_selectedIndex) {
+  Widget _getBodyWidget(int selectedIndex) {
+    switch (selectedIndex) {
       case 0:
         return Home(
           

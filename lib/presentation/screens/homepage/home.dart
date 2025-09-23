@@ -1,4 +1,3 @@
-import 'package:fintechui/presentation/screens/homepage/home_page.dart';
 import 'package:fintechui/presentation/screens/profile/user_profile.dart';
 import 'package:fintechui/presentation/widgets/homewidget/card_carousel.dart';
 import 'package:flutter/material.dart';
@@ -6,10 +5,6 @@ import 'package:flutter/material.dart';
 import '../../widgets/homewidget/quick_actions.dart';
 import '../../widgets/homewidget/scheduled_payment.dart';
 import '../../widgets/homewidget/service_action.dart';
-import 'package:flutter/material.dart';
-import "package:flutter/services.dart";
-import "package:provider/provider.dart";
-import "package:shared_preferences/shared_preferences.dart";
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -31,7 +26,7 @@ class _HomeState extends State<Home> {
     }
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar:  AppBar(
+      appBar: AppBar(
         backgroundColor: Colors.white,
         leading: Stack(
           children: [
@@ -43,7 +38,8 @@ class _HomeState extends State<Home> {
                   backgroundColor: Colors.grey[200],
                   child: ClipRRect(
                     borderRadius: BorderRadius.all(Radius.circular(20)),
-                      child: Icon(Icons.person,color: Colors.grey[600],size: 30,)),
+                    child: Icon(Icons.person,color: Colors.grey[600],size: 30,),
+                  ),
                 ),
               ),
             ),
@@ -56,8 +52,7 @@ class _HomeState extends State<Home> {
                   color: Colors.red,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors
-                        .white, 
+                    color: Colors.white, 
                     width: 1, 
                   ),
                 ),
@@ -94,7 +89,7 @@ class _HomeState extends State<Home> {
           children: [
             SizedBox(height: 30,),
             SizedBox(
-              height: 215,
+              height: 220,
               child: CardCarousel(),
             ),
             SizedBox(height: 15,),
@@ -113,9 +108,9 @@ class _HomeState extends State<Home> {
                   ),),
                   GestureDetector(
                     onTap: (){},
-                      child: Text("View all",style: TextStyle(
-                        color: Colors.grey
-                      ),),),
+                    child: Text("View all",style: TextStyle(
+                      color: Colors.grey
+                    ),),),
 
                 ],
               ),

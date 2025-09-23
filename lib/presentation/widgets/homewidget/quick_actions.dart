@@ -1,6 +1,7 @@
-import 'package:fintechui/presentation/screens/sidescreens/paybillscreen/bank_to_bank.dart';
 import 'package:fintechui/presentation/screens/sidescreens/paybillscreen/pay_bill_screen.dart';
 import 'package:fintechui/presentation/screens/sidescreens/transferscreen/money_transfer.dart';
+import 'package:fintechui/presentation/screens/sidescreens/unified_fund_wallet_screen.dart';
+import 'package:fintechui/presentation/screens/sidescreens/bank_transfer_screen.dart';
 import 'package:flutter/material.dart';
 class QuickAction {
   final String title;
@@ -22,6 +23,14 @@ class QuickActionsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<QuickAction> quickActions = [
     QuickAction(
+      title: 'Fund Wallet',
+      icon: Icons.account_balance_wallet,
+      backgroundColor: Colors.purple.shade100,
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context)=> const UnifiedFundWalletScreen()));
+      },
+    ),
+    QuickAction(
       title: 'Money Transfer',
       icon: Icons.attach_money,
       backgroundColor: Colors.green.shade100,
@@ -30,21 +39,21 @@ class QuickActionsSection extends StatelessWidget {
       },
     ),
     QuickAction(
+      title: 'Bank Transfer',
+      icon: Icons.account_balance,
+      backgroundColor: Colors.orange.shade100,
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PaystackBankTransferScreen(),
+        ),
+      ),
+    ),
+    QuickAction(
       title: 'Pay Bill',
       icon: Icons.receipt_long,
       backgroundColor: Colors.blue.shade100,
       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context)=> PayBillScreen())),
-    ),
-    QuickAction(
-      title: 'Bank to Bank',
-      icon: Icons.account_balance,
-      backgroundColor: Colors.grey.shade200,
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => BankTransferScreen(), // Replace with actual Bank to Bank screen
-        ),
-    ),
     ),
   ];
 
@@ -130,6 +139,9 @@ class QuickActionsSection extends StatelessWidget {
   Color _getIconColor(Color backgroundColor) {
     if (backgroundColor == Colors.green.shade100) return Colors.green.shade700;
     if (backgroundColor == Colors.blue.shade100) return Colors.blue.shade700;
+    if (backgroundColor == Colors.purple.shade100) return Colors.purple.shade700;
+    if (backgroundColor == Colors.orange.shade100) return Colors.orange.shade700;
+    if (backgroundColor == Colors.yellow.shade100) return Colors.yellow.shade700;
     return Colors.grey.shade700;
   }
 }

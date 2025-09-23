@@ -6,6 +6,7 @@ class AtmCard extends StatelessWidget {
   final String cardNumber;
   final String cardHolder;
   final Color? cardColor;
+  final bool isRealTime;
 
   const AtmCard({
     Key? key,
@@ -13,11 +14,12 @@ class AtmCard extends StatelessWidget {
     required this.cardNumber,
     required this.cardHolder,
     this.cardColor,
+    this.isRealTime = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Use the passed color or default gradient
+    // Use the passed color or default Chipper Cash gradient
     final List<Color> gradientColors = cardColor != null
         ? [
             cardColor!,
@@ -25,9 +27,9 @@ class AtmCard extends StatelessWidget {
             cardColor!.withOpacity(0.6),
           ]
         : [
-            Color(0xFF7B83FF),
-            Color(0xFF5865FF),
-            Color(0xFF4B57FF),
+            Color(0xFF1A1B2E), // Chipper Cash dark blue
+            Color(0xFF2D2E42),
+            Color(0xFF3A3B5C),
           ];
 
     return Container(
@@ -39,12 +41,19 @@ class AtmCard extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: gradientColors,
         ),
-        borderRadius: BorderRadius.circular(13),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 20,
+            offset: Offset(0, 8),
+            spreadRadius: 0,
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 6,
-            offset: Offset(0, 3),
+            offset: Offset(0, 2),
+            spreadRadius: 0,
           ),
         ],
       ),
@@ -59,52 +68,92 @@ class AtmCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Available balance",
-                    style: TextStyle(color: Colors.white),
+                  Row(
+                    children: [
+                      Text(
+                        "Available balance",
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      if (isRealTime) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade400,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 6,
+                                height: 6,
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Text(
+                                'LIVE',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
+                  SizedBox(height: 8),
                   Text(
-                    "\$ ${availableBalance.toStringAsFixed(2)}",
-                    style: TextStyle(
+                    "₦${availableBalance.toStringAsFixed(2)}",
+                    style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 25,
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
+                      letterSpacing: -0.5,
                     ),
                   ),
                 ],
               ),
-              Image.asset('lib/images/group.png')
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.account_balance_wallet,
+                  color: Colors.white.withOpacity(0.8),
+                  size: 24,
+                ),
+              ),
             ],
           ),
-          SizedBox(height: 10),
+          
+          Spacer(),
+          
+          // Card number with better spacing
           Text(
             cardNumber,
             style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              letterSpacing: 3,
+              color: Colors.white.withOpacity(0.9),
+              fontSize: 16,
+              letterSpacing: 2,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          Row(
-            children: [
-              Text(
-                'Valid from 10/25',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                ),
-              ),
-              SizedBox(width: 25),
-              Text(
-                'Valid Thru 10/30',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 20),
+          
+          SizedBox(height: 16),
+          
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -113,8 +162,13 @@ class AtmCard extends StatelessWidget {
                 children: [
                   Text(
                     'Card Holder',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.7),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
+                  SizedBox(height: 2),
                   Text(
                     cardHolder,
                     style: TextStyle(
@@ -125,13 +179,28 @@ class AtmCard extends StatelessWidget {
                   ),
                 ],
               ),
-              Image.asset(
-                'lib/images/verve.png',
-                width: 36,
-                height: 22,
-              )
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      'VISA',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
-          )
+          ),
         ],
       ),
     );

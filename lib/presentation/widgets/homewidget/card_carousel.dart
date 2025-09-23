@@ -1,124 +1,164 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/services/realtime_balance_service.dart';
+import '../../../core/services/user_service.dart';
 import 'atm_card.dart';
 
-class CardCarousel extends StatelessWidget {
+class CardCarousel extends ConsumerStatefulWidget {
+  @override
+  ConsumerState<CardCarousel> createState() => _CardCarouselState();
+}
+
+class _CardCarouselState extends ConsumerState<CardCarousel> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final UserService _userService = UserService();
+  final PageController _pageController = PageController();
+  String _username = 'User';
+  int _currentIndex = 0;
 
-  Stream<List<Map<String, dynamic>>> _getCardsStream() {
-    final user = _auth.currentUser;
-    if (user == null) return Stream.value([]);
-
-    return _firestore
-        .collection('users')
-        .doc(user.uid)
-        .snapshots()
-        .map((snapshot) {
-      String username = snapshot.exists
-          ? (snapshot.data()?['username'] ?? user.displayName ?? 'User')
-          : user.displayName ?? 'User';
-
-      double realBalance = snapshot.exists && snapshot.data()?['balance'] != null
-          ? (snapshot.data()!['balance'] as num).toDouble()
-          : 0.0;
-
-      return [
-        {
-          'balance': realBalance,
-          'number': '**** **** **** 8635',
-          'holder': username,
-          'color': Colors.blue.shade700,
-        },
-        {
-          'balance': 2129.33,
-          'number': '**** **** **** 5678',
-          'holder': username,
-          'color': Colors.red.shade700,
-        },
-        {
-          'balance': 2323.32,
-          'number': '**** **** **** 9012',
-          'holder': username,
-          'color': Colors.green.shade700,
-        },
-      ];
-    }).handleError((error) {
-      print('Error in cards stream: $error');
-      return [
-        {
-          'balance': 0.0,
-          'number': '**** **** **** 8635',
-          'holder': 'User',
-          'color': Colors.blue.shade700,
-        },
-        {
-          'balance': 2129.33,
-          'number': '**** **** **** 5678',
-          'holder': 'User',
-          'color': Colors.red.shade700,
-        },
-        {
-          'balance': 2323.32,
-          'number': '**** **** **** 9012',
-          'holder': 'User',
-          'color': Colors.green.shade700,
-        },
-      ];
+  @override
+  void initState() {
+    super.initState();
+    _loadUsername();
+    // Initialize real-time updates when widget is created
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final service = ref.read(realtimeBalanceServiceProvider);
+      service.initializeRealtimeUpdates();
     });
   }
 
   @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadUsername() async {
+    try {
+      final username = await _userService.getCurrentUsername();
+      if (mounted) {
+        setState(() {
+          _username = username;
+        });
+      }
+    } catch (e) {
+      print('Error loading username: $e');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 200,
-      child: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: _getCardsStream(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
+    final balanceAsync = ref.watch(balanceStreamProvider);
+    final user = _auth.currentUser;
+    
+    if (user == null) {
+      return const Center(child: Text('Please log in'));
+    }
+
+    return Column(
+      children: [
+        SizedBox(
+          height: 200,
+          child: balanceAsync.when(
+            data: (balance) => PageView.builder(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+              itemCount: 3,
+              itemBuilder: (context, index) {
+                List<Map<String, dynamic>> cards = [
+                  {
+                    'balance': balance, // Real-time balance
+                    'number': '**** **** **** 8635',
+                    'holder': _username,
+                    'color': Color(0xFF1A1B2E), // Chipper Cash dark blue
+                    'isRealTime': true,
+                  },
+                  {
+                    'balance': 2129.33,
+                    'number': '**** **** **** 5678',
+                    'holder': _username,
+                    'color': Color(0xFF2D2E42), // Darker blue variant
+                    'isRealTime': false,
+                  },
+                  {
+                    'balance': 2323.32,
+                    'number': '**** **** **** 9012',
+                    'holder': _username,
+                    'color': Color(0xFF1A1B2E), // Chipper Cash dark blue
+                    'isRealTime': false,
+                  },
+                ];
+                
+                return AnimatedBuilder(
+                  animation: _pageController,
+                  builder: (context, child) {
+                    double value = 0.0;
+                    if (_pageController.position.haveDimensions) {
+                      value = index.toDouble() - (_pageController.page ?? 0);
+                      value = (1 - (value.abs() * 0.15)).clamp(0.0, 1.0);
+                    } else {
+                      value = index == 0 ? 1.0 : 0.85;
+                    }
+
+                    return Transform.scale(
+                      scale: value,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 8.0 * (1 - value),
+                        ),
+                        child: AtmCard(
+                          availableBalance: cards[index]['balance'],
+                          cardNumber: cards[index]['number'],
+                          cardHolder: cards[index]['holder'],
+                          cardColor: cards[index]['color'],
+                          isRealTime: cards[index]['isRealTime'] ?? false,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+            loading: () => const Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1A1B2E)),
               ),
-            );
-          }
-          
-          if (snapshot.hasError) {
-            return Center(
+            ),
+            error: (error, stack) => Center(
               child: Text(
-                'Error loading cards',
-                style: TextStyle(color: Colors.red),
+                'Error loading balance: $error',
+                style: const TextStyle(color: Colors.red),
+              ),
+            ),
+          ),
+        ),
+        
+        // Page indicators
+        SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(3, (index) {
+            return AnimatedContainer(
+              duration: Duration(milliseconds: 300),
+              margin: EdgeInsets.symmetric(horizontal: 3),
+              width: _currentIndex == index ? 20 : 6,
+              height: 6,
+              decoration: BoxDecoration(
+                color: _currentIndex == index 
+                    ? Color(0xFF1A1B2E) 
+                    : Color(0xFF1A1B2E).withOpacity(0.3),
+                borderRadius: BorderRadius.circular(3),
               ),
             );
-          }
-          
-          final cards = snapshot.data ?? [];
-          
-          if (cards.isEmpty) {
-            return Center(
-              child: Text(
-                'No cards available',
-                style: TextStyle(color: Colors.grey),
-              ),
-            );
-          }
-          
-          return ListView.builder(
-            shrinkWrap: true,
-            scrollDirection: Axis.horizontal,
-            itemCount: cards.length,
-            itemBuilder: (context, index) {
-              return AtmCard(
-                availableBalance: cards[index]['balance'],
-                cardNumber: cards[index]['number'],
-                cardHolder: cards[index]['holder'],
-                cardColor: cards[index]['color'],
-              );
-            },
-          );
-        },
-      ),
+          }),
+        ),
+      ],
     );
   }
 }
