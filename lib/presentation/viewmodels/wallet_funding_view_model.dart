@@ -34,28 +34,29 @@ class WalletFundingViewModel extends StateNotifier<WalletFundingState> {
   }
 
   /// Add money to wallet
-  Future<void> addMoneyToWallet(String userEmail) async {
+  Future<void> addMoneyToWallet(String userEmail, {double? amount, String? description}) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final amount = double.parse(amountController.text);
-      final description = descriptionController.text.trim().isEmpty 
+      // Use provided amount or fall back to controller
+      final finalAmount = amount ?? double.parse(amountController.text);
+      final finalDescription = description ?? (descriptionController.text.trim().isEmpty 
           ? 'Wallet funding' 
-          : descriptionController.text.trim();
+          : descriptionController.text.trim());
 
       final result = await _transferService.addMoneyToWallet(
-        amount: amount,
+        amount: finalAmount,
         email: userEmail,
-        description: description,
+        description: finalDescription,
       );
 
       if (result['success'] == true) {
         state = state.copyWith(
           isLoading: false,
           isSuccess: true,
-          authorizationUrl: result['authorization_url'],
-          reference: result['reference'],
-          accessCode: result['access_code'],
+          authorizationUrl: result['authorization_url'] ?? '',
+          reference: result['reference'] ?? '',
+          accessCode: result['access_code'] ?? '',
         );
       } else {
         state = state.copyWith(

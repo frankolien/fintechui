@@ -1,16 +1,12 @@
 import 'package:fintechui/presentation/screens/homepage/atm_locator.dart';
 import 'package:fintechui/presentation/screens/homepage/home.dart';
 import 'package:fintechui/presentation/screens/homepage/qr_code_scanner_screen.dart';
-import 'package:fintechui/presentation/screens/sidescreens/transferscreen/recent_transaction.dart';
-import 'package:fintechui/presentation/screens/sidescreens/transferscreen/transfer_successful_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../viewmodels/home_page_view_model.dart';
 import 'insurance_screen.dart';
-import 'menu_screen.dart';
 import 'trend_screen.dart';
-import 'wallet_screen.dart';
 class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {

@@ -57,8 +57,8 @@ class RealBankingService {
       return {
         'success': true,
         'reference': reference,
-        'authorization_url': paystackResponse['data']['authorization_url'],
-        'access_code': paystackResponse['data']['access_code'],
+        'authorization_url': paystackResponse['data']['authorization_url'] ?? '',
+        'access_code': paystackResponse['data']['access_code'] ?? '',
         'message': 'Bank payment initialized successfully',
         'payment_method': 'bank',
       };
@@ -119,8 +119,8 @@ class RealBankingService {
       return {
         'success': true,
         'reference': reference,
-        'authorization_url': paystackResponse['data']['authorization_url'],
-        'access_code': paystackResponse['data']['access_code'],
+        'authorization_url': paystackResponse['data']['authorization_url'] ?? '',
+        'access_code': paystackResponse['data']['access_code'] ?? '',
         'message': 'Bank transfer initialized successfully',
       };
     } catch (e) {
@@ -150,9 +150,9 @@ class RealBankingService {
       // Verify with Paystack
       print('🔍 Verifying bank payment with Paystack...');
       final verificationResponse = await _paystackService.verifyTransaction(reference);
-      final status = verificationResponse['data']['status'];
-      final gatewayResponse = verificationResponse['data']['gateway_response'];
-      final message = verificationResponse['data']['message'];
+      final status = verificationResponse['data']['status'] ?? 'unknown';
+      final gatewayResponse = verificationResponse['data']['gateway_response'] ?? '';
+      final message = verificationResponse['data']['message'] ?? '';
       
       print('📊 Paystack bank payment verification response:');
       print('   Status: $status');

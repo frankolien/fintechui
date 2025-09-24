@@ -52,8 +52,8 @@ class EnhancedTransferService {
       return {
         'success': true,
         'reference': reference,
-        'authorization_url': paystackResponse['data']['authorization_url'],
-        'access_code': paystackResponse['data']['access_code'],
+        'authorization_url': paystackResponse['data']['authorization_url'] ?? '',
+        'access_code': paystackResponse['data']['access_code'] ?? '',
         'message': 'Transaction initialized successfully',
       };
     } catch (e) {

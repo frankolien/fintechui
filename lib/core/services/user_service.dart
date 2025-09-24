@@ -20,7 +20,7 @@ class UserService {
           'username': username,
           'fullName': fullName,
           'phoneNumber': phoneNumber ?? '',
-          'balance': 8681.41,
+          'balance': 0.0, // Start with zero balance
           'createdAt': FieldValue.serverTimestamp(),
         });
         return "success";

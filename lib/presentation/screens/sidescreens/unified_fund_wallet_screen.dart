@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../viewmodels/wallet_funding_view_model.dart';
 import '../../../core/services/real_banking_service.dart';
+import '../../../core/services/paystack_service.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/custom_button.dart';
 
@@ -21,6 +22,7 @@ class _UnifiedFundWalletScreenState extends ConsumerState<UnifiedFundWalletScree
   final _descriptionController = TextEditingController();
   
   final RealBankingService _bankingService = RealBankingService();
+  final PaystackService _paystackService = PaystackService();
   
   bool _isLoading = false;
   String? _errorMessage;
@@ -92,13 +94,17 @@ class _UnifiedFundWalletScreenState extends ConsumerState<UnifiedFundWalletScree
       if (_selectedFundingMethod == 'paystack') {
         // Use Paystack wallet funding
         final walletFundingViewModel = ref.read(walletFundingViewModelProvider.notifier);
-        await walletFundingViewModel.addMoneyToWallet(email);
+        await walletFundingViewModel.addMoneyToWallet(
+          email,
+          amount: amount,
+          description: description,
+        );
         
         final walletFundingState = ref.read(walletFundingViewModelProvider);
         result = {
           'success': true,
-          'reference': walletFundingState.reference,
-          'authorization_url': walletFundingState.authorizationUrl,
+          'reference': walletFundingState.reference ?? '',
+          'authorization_url': walletFundingState.authorizationUrl ?? '',
           'method': 'paystack',
         };
       } else {
@@ -121,10 +127,13 @@ class _UnifiedFundWalletScreenState extends ConsumerState<UnifiedFundWalletScree
           });
           
           // Show appropriate instructions dialog
-          if (result['method'] == 'bank') {
-            _showBankPaymentInstructionsDialog(result['authorization_url']);
-          } else {
-            _showPaystackPaymentInstructionsDialog(result['authorization_url']);
+          final authUrl = result['authorization_url'] as String?;
+          if (authUrl != null && authUrl.isNotEmpty) {
+            if (result['method'] == 'bank') {
+              _showBankPaymentInstructionsDialog(authUrl);
+            } else {
+              _showPaystackPaymentInstructionsDialog(authUrl);
+            }
           }
         } else {
           setState(() {
@@ -138,7 +147,16 @@ class _UnifiedFundWalletScreenState extends ConsumerState<UnifiedFundWalletScree
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _errorMessage = e.toString();
+          // Provide more user-friendly error messages
+          if (e.toString().contains('API keys are not configured')) {
+            _errorMessage = 'Payment service not configured. Please contact support.';
+          } else if (e.toString().contains('No user logged in')) {
+            _errorMessage = 'Please log in to continue.';
+          } else if (e.toString().contains('Amount must be greater than 0')) {
+            _errorMessage = 'Please enter a valid amount.';
+          } else {
+            _errorMessage = 'Payment initialization failed. Please try again.';
+          }
         });
       }
     }
@@ -314,13 +332,34 @@ class _UnifiedFundWalletScreenState extends ConsumerState<UnifiedFundWalletScree
     try {
       print('🔍 Unified Fund Wallet: Starting verification for reference: ${_paymentData!['reference']}');
       
-      if (_paymentData!['method'] == 'paystack') {
-        // Verify Paystack payment
-        final walletFundingViewModel = ref.read(walletFundingViewModelProvider.notifier);
-        await walletFundingViewModel.verifyWalletFunding(_paymentData!['reference']);
-      } else {
-        // Verify bank payment
-        await _bankingService.verifyBankPayment(_paymentData!['reference']);
+      // Try verification up to 3 times with delays
+      bool verificationSuccessful = false;
+      int attempts = 0;
+      const maxAttempts = 3;
+      
+      while (!verificationSuccessful && attempts < maxAttempts) {
+        attempts++;
+        print('🔍 Verification attempt $attempts of $maxAttempts');
+        
+        try {
+          if (_paymentData!['method'] == 'paystack') {
+            // Verify Paystack payment
+            final walletFundingViewModel = ref.read(walletFundingViewModelProvider.notifier);
+            await walletFundingViewModel.verifyWalletFunding(_paymentData!['reference']);
+          } else {
+            // Verify bank payment
+            await _bankingService.verifyBankPayment(_paymentData!['reference']);
+          }
+          verificationSuccessful = true;
+        } catch (e) {
+          print('❌ Verification attempt $attempts failed: $e');
+          if (attempts < maxAttempts) {
+            // Wait before retrying
+            await Future.delayed(Duration(seconds: attempts * 2));
+          } else {
+            rethrow; // Re-throw the last error
+          }
+        }
       }
       
       if (mounted) {
@@ -331,18 +370,23 @@ class _UnifiedFundWalletScreenState extends ConsumerState<UnifiedFundWalletScree
         });
       }
     } catch (e) {
-      print('❌ Unified Fund Wallet: Verification failed: $e');
+      print('❌ Unified Fund Wallet: Verification failed after 3 attempts: $e');
       
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _errorMessage = e.toString();
+          // Provide more user-friendly error messages
+          if (e.toString().contains('abandoned')) {
+            _errorMessage = 'Payment was not completed. Please try again.';
+            _showAbandonedTransactionDialog();
+          } else if (e.toString().contains('pending')) {
+            _errorMessage = 'Payment is still processing. Please wait a moment and try again.';
+          } else if (e.toString().contains('failed')) {
+            _errorMessage = 'Payment failed. Please try again with a different payment method.';
+          } else {
+            _errorMessage = 'Payment verification failed. Please try again.';
+          }
         });
-        
-        // Show specific guidance for abandoned transactions
-        if (e.toString().contains('abandoned')) {
-          _showAbandonedTransactionDialog();
-        }
       }
     }
   }
@@ -454,39 +498,132 @@ class _UnifiedFundWalletScreenState extends ConsumerState<UnifiedFundWalletScree
               // Header Section
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.purple[600]!, Colors.purple[400]!],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      spreadRadius: 0,
+                      blurRadius: 20,
+                      offset: const Offset(0, 4),
+                    ),
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.02),
+                      spreadRadius: 0,
+                      blurRadius: 40,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: Colors.grey.withOpacity(0.1),
+                    width: 1,
                   ),
-                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Fund Your Wallet',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Add money to your wallet using your preferred payment method',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                      ),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.account_balance_wallet,
+                            color: Colors.blue[600],
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Fund Your Wallet',
+                                style: TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Add money to your wallet using your preferred payment method',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.4,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
 
               const SizedBox(height: 24),
+
+              // Payment Mode Indicator
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: _paystackService.isLiveMode ? Colors.green[50] : Colors.orange[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: _paystackService.isLiveMode ? Colors.green[200]! : Colors.orange[200]!,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          _paystackService.isLiveMode ? Icons.account_balance_wallet : Icons.science,
+                          color: _paystackService.isLiveMode ? Colors.green[600] : Colors.orange[600],
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _paystackService.isLiveMode 
+                                ? '💰 LIVE MODE: Real money will be charged'
+                                : '🧪 TEST MODE: No real money will be charged',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: _paystackService.isLiveMode ? Colors.green[700] : Colors.orange[700],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (!_paystackService.isLiveMode) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        'To activate live mode: Complete Paystack business verification and request live access.',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.orange[600],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
 
               // Payment Method Selection
               const Text(

@@ -25,7 +25,7 @@ class QuickActionsSection extends StatelessWidget {
     QuickAction(
       title: 'Fund Wallet',
       icon: Icons.account_balance_wallet,
-      backgroundColor: Colors.purple.shade100,
+      backgroundColor: Colors.blue.shade50,
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context)=> const UnifiedFundWalletScreen()));
       },
@@ -41,7 +41,7 @@ class QuickActionsSection extends StatelessWidget {
     QuickAction(
       title: 'Bank Transfer',
       icon: Icons.account_balance,
-      backgroundColor: Colors.orange.shade100,
+      backgroundColor: Colors.green.shade50,
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
@@ -138,8 +138,9 @@ class QuickActionsSection extends StatelessWidget {
 
   Color _getIconColor(Color backgroundColor) {
     if (backgroundColor == Colors.green.shade100) return Colors.green.shade700;
+    if (backgroundColor == Colors.green.shade50) return Colors.green.shade700;
     if (backgroundColor == Colors.blue.shade100) return Colors.blue.shade700;
-    if (backgroundColor == Colors.purple.shade100) return Colors.purple.shade700;
+    if (backgroundColor == Colors.blue.shade50) return Colors.blue.shade700;
     if (backgroundColor == Colors.orange.shade100) return Colors.orange.shade700;
     if (backgroundColor == Colors.yellow.shade100) return Colors.yellow.shade700;
     return Colors.grey.shade700;

@@ -3,8 +3,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'firebase_options.dart';
+import 'core/services/realtime_balance_service.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -41,6 +43,19 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     print("Firebase initialized successfully");
+    
+    // Initialize real-time balance service when user is authenticated
+    FirebaseAuth.instance.authStateChanges().listen((user) async {
+      if (user != null) {
+        try {
+          final balanceService = RealtimeBalanceService();
+          await balanceService.initializeRealtimeUpdates();
+          print("Real-time balance service initialized for user: ${user.email}");
+        } catch (e) {
+          print("Error initializing real-time balance service: $e");
+        }
+      }
+    });
   } catch (e) {
     print("Firebase initialization error: $e");
   }

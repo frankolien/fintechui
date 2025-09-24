@@ -2,7 +2,6 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fintechui/presentation/screens/onboarding/splash_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -211,11 +210,11 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: const [
-          Text('Total balance', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+        children: [
+          const Text('Total balance', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
           Text(
-            '\$8681.41',
-            style: TextStyle(
+            '₦${(userData!['balance'] ?? 0.0).toStringAsFixed(2)}',
+            style: const TextStyle(
               fontWeight: FontWeight.w700,
               fontSize: 17,
               letterSpacing: 1.2,

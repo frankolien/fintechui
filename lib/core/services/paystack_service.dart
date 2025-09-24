@@ -6,11 +6,34 @@ class PaystackService {
   late final Dio _dio;
   late final String _secretKey;
   late final String _publicKey;
+  late final bool _isLiveMode;
 
   PaystackService() {
     _dio = Dio();
     _secretKey = dotenv.env['PAYSTACK_SECRET_KEY'] ?? '';
     _publicKey = dotenv.env['PAYSTACK_PUBLIC_KEY'] ?? '';
+    
+    // Validate API keys
+    if (_secretKey.isEmpty || _publicKey.isEmpty) {
+      print('⚠️ WARNING: Paystack API keys are not configured!');
+      print('Please create a .env file with your Paystack API keys:');
+      print('For TEST mode:');
+      print('PAYSTACK_SECRET_KEY=sk_test_your_secret_key_here');
+      print('PAYSTACK_PUBLIC_KEY=pk_test_your_public_key_here');
+      print('');
+      print('For LIVE mode (real money):');
+      print('PAYSTACK_SECRET_KEY=sk_live_your_live_secret_key_here');
+      print('PAYSTACK_PUBLIC_KEY=pk_live_your_live_public_key_here');
+    } else if (_secretKey.startsWith('sk_test_')) {
+      _isLiveMode = false;
+      print('🧪 Using Paystack TEST mode - No real money will be charged');
+    } else if (_secretKey.startsWith('sk_live_')) {
+      _isLiveMode = true;
+      print('💰 Using Paystack LIVE mode - Real money will be charged!');
+    } else {
+      _isLiveMode = false;
+      print('⚠️ Unknown API key format - defaulting to TEST mode');
+    }
     
     _dio.options.baseUrl = _baseUrl;
     _dio.options.headers = {
@@ -29,6 +52,10 @@ class PaystackService {
     bool enableBankPayment = true, // Enable "Pay with Bank" by default
   }) async {
     try {
+      // Check if API keys are configured
+      if (_secretKey.isEmpty || _publicKey.isEmpty) {
+        throw Exception('Paystack API keys are not configured. Please check your .env file.');
+      }
       final data = {
         'email': email,
         'amount': (amount * 100).toInt(), // Convert to kobo (smallest currency unit)
@@ -242,6 +269,12 @@ class PaystackService {
 
   /// Get public key for frontend integration
   String get publicKey => _publicKey;
+  
+  /// Check if currently in live mode
+  bool get isLiveMode => _isLiveMode;
+  
+  /// Check if we can simulate real money transactions
+  bool get canSimulateRealMoney => !_isLiveMode;
 
   /// Get list of supported banks for "Pay with Bank"
   Future<List<Map<String, dynamic>>> getSupportedBanks() async {

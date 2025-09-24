@@ -12,7 +12,7 @@ class TransferService {
       await _firestore.collection('users').doc(uid).set({
         'username': username,
         'email': email,
-        'balance': 8681.41, // Default balance
+        'balance': 0.0, // Start with zero balance
         'createdAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
